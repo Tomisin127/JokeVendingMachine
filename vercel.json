@@ -5,7 +5,7 @@
   "framework": "vite",
   "functions": {
     "api/*.ts": {
-      "runtime": "@vercel/node@24.0.1"
+      "runtime": "nodejs24.x"
     }
   },
   "rewrites": [
