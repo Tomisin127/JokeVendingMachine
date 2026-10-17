@@ -23,7 +23,7 @@ export default function JokeMachine() {
   async function fetchJoke() {
     setState({ status: "loading" });
     try {
-      const endpoint = `${window.location.origin}/joke`;
+      const endpoint = `${window.location.origin}/api/joke`;
       const res = await fetch(endpoint);
 
       if (res.status === 402) {
@@ -34,7 +34,7 @@ export default function JokeMachine() {
           status: "error",
           message:
             `Payment required (HTTP 402). This endpoint costs $0.001 USDC via x402. ` +
-            `Pay with: circle services pay "${window.location.origin}/joke" -X GET --max-amount 0.001 --network arc-mainnet` +
+            `Pay with: circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet` +
             (paymentHeader ? `\n\nPayment details: ${paymentHeader}` : "") +
             (body ? `\n\nBody: ${JSON.stringify(body, null, 2)}` : ""),
         });
@@ -58,14 +58,14 @@ export default function JokeMachine() {
   }
 
   function copyCommand() {
-    const cmd = `circle services pay "${window.location.origin}/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
+    const cmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
     void navigator.clipboard.writeText(cmd).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   }
 
-  const payCmd = `circle services pay "${window.location.origin}/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
+  const payCmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12"
@@ -218,7 +218,7 @@ export default function JokeMachine() {
 
         <div className="mt-4 rounded-xl p-3 text-xs" style={{ background: "var(--surface-muted)", color: "var(--muted)", border: "1px solid var(--border)" }}>
           <div className="font-semibold mb-1" style={{ color: "var(--ink)" }}>Payable endpoint</div>
-          <code className="mono break-all" style={{ color: "var(--ink-2)" }}>{`${window.location.origin}/joke`}</code>
+          <code className="mono break-all" style={{ color: "var(--ink-2)" }}>{`${window.location.origin}/api/joke`}</code>
           <p className="mt-1">This URL returns HTTP 402 until a valid Arc mainnet payment is supplied.</p>
         </div>
 
@@ -226,7 +226,7 @@ export default function JokeMachine() {
           <div className="flex items-start gap-2">
             <span className="mono text-xs px-1.5 py-0.5 rounded"
               style={{ background: "var(--surface-muted)", color: "var(--ink-2)", flexShrink: 0 }}>
-              GET /joke
+              GET /api/joke
             </span>
             <span>Returns 402 with payment requirements; successful payment returns a joke</span>
           </div>
