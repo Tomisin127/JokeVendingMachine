@@ -23,7 +23,8 @@ export default function JokeMachine() {
   async function fetchJoke() {
     setState({ status: "loading" });
     try {
-      const res = await fetch("/api/joke");
+      const endpoint = `${window.location.origin}/api/joke`;
+      const res = await fetch(endpoint);
 
       if (res.status === 402) {
         // Surface the 402 details — this is the expected unpaid response
@@ -33,7 +34,7 @@ export default function JokeMachine() {
           status: "error",
           message:
             `Payment required (HTTP 402). This endpoint costs $0.001 USDC via x402. ` +
-            `Pay with: circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001` +
+            `Pay with: circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet` +
             (paymentHeader ? `\n\nPayment details: ${paymentHeader}` : "") +
             (body ? `\n\nBody: ${JSON.stringify(body, null, 2)}` : ""),
         });
@@ -57,14 +58,14 @@ export default function JokeMachine() {
   }
 
   function copyCommand() {
-    const cmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001`;
+    const cmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
     void navigator.clipboard.writeText(cmd).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   }
 
-  const payCmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001`;
+  const payCmd = `circle services pay "${window.location.origin}/api/joke" -X GET --max-amount 0.001 --network arc-mainnet`;
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12"
@@ -196,7 +197,7 @@ export default function JokeMachine() {
           </h2>
           <span className="text-xs px-2 py-0.5 rounded-full"
             style={{ background: "var(--surface-muted)", color: "var(--muted)", border: "1px solid var(--border)" }}>
-            Arc Testnet
+            Arc Mainnet
           </span>
         </div>
 

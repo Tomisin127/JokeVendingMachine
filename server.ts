@@ -45,9 +45,10 @@ app.use((req, res, next) => {
 });
 
 const gateway = createGatewayMiddleware({
-  sellerAddress: process.env.VITE_SELLER_ADDRESS,
+  sellerAddress: process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS,
   facilitatorUrl: "https://gateway-api.circle.com",
-  networks: "eip155:5042",
+  // Arc mainnet only. Arc testnet is 5042002.
+  networks: "eip155:5042000",
 });
 
 // Health check — no payment required

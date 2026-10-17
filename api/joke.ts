@@ -51,13 +51,29 @@ app.use((_req: express.Request, res: express.Response, next: express.NextFunctio
   next();
 });
 
-const gateway = createGatewayMiddleware({
-  sellerAddress: process.env.VITE_SELLER_ADDRESS,
-  facilitatorUrl: "https://gateway-api.circle.com",
-  networks: "eip155:5042",
-});
+const sellerAddress = process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS;
+// Arc mainnet chain ID is 5042000 (Arc testnet is 5042002). Keep this
+// endpoint mainnet-only so payments from other networks are rejected.
+const arcMainnet = "eip155:5042000";
 
-app.get("/api/joke", gateway.require("$0.001"), (req: PaidRequest, res) => {
+const gateway = sellerAddress
+  ? createGatewayMiddleware({
+      sellerAddress,
+      facilitatorUrl: "https://gateway-api.circle.com",
+      networks: arcMainnet,
+    })
+  : null;
+
+app.get("/api/joke", (req: PaidRequest, res, next) => {
+  if (!gateway) {
+    res.status(500).json({
+      error: "Payment service is not configured",
+      detail: "Set SELLER_ADDRESS to the Arc mainnet recipient wallet.",
+    });
+    return;
+  }
+  return gateway.require("$0.001")(req, res, next);
+}, (req: PaidRequest, res) => {
   const { payer, amount, network } = req.payment!;
   const formattedAmount = (Number(amount) / 1_000_000).toFixed(6);
   const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
