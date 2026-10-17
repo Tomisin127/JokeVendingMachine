@@ -3,8 +3,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import express from "express";
 import { createGatewayMiddleware } from "@circle-fin/x402-batching/server";
-import { formatUnits } from "viem";
-
 type PaidRequest = express.Request & {
   payment?: {
     verified: boolean;
@@ -53,24 +51,15 @@ app.use((_req: express.Request, res: express.Response, next: express.NextFunctio
   next();
 });
 
-// Seller address is set as SELLER_ADDRESS (or VITE_SELLER_ADDRESS for Vercel env UI)
-const sellerAddress =
-  (process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS) as `0x${string}`;
-
-if (!sellerAddress) {
-  throw new Error("SELLER_ADDRESS env var is required");
-}
-
 const gateway = createGatewayMiddleware({
-  sellerAddress,
-  // Arc mainnet only — eip155:5042
+  sellerAddress: process.env.VITE_SELLER_ADDRESS,
   facilitatorUrl: "https://gateway-api.circle.com",
-  networks: ["eip155:5042"],
+  networks: "eip155:5042",
 });
 
 app.get("/api/joke", gateway.require("$0.001"), (req: PaidRequest, res) => {
   const { payer, amount, network } = req.payment!;
-  const formattedAmount = formatUnits(BigInt(amount), 6);
+  const formattedAmount = (Number(amount) / 1_000_000).toFixed(6);
   const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
 
   console.log(`[joke] Sold for ${formattedAmount} USDC by ${payer} on ${network}`);
