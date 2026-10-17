@@ -1,7 +1,5 @@
 import express from "express";
 import { createGatewayMiddleware } from "@circle-fin/x402-batching/server";
-import { formatUnits } from "viem";
-
 type PaidRequest = express.Request & {
   payment?: {
     verified: boolean;
@@ -46,20 +44,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const sellerAddress =
-  (process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS) as `0x${string}` | undefined;
-
-if (!sellerAddress) {
-  console.warn(
-    "[joke-server] SELLER_ADDRESS not set — set SELLER_ADDRESS or VITE_SELLER_ADDRESS in .env."
-  );
-}
-
 const gateway = createGatewayMiddleware({
-  sellerAddress: sellerAddress ?? "0x0000000000000000000000000000000000000000",
-  // Arc mainnet only — eip155:5042
+  sellerAddress: process.env.VITE_SELLER_ADDRESS,
   facilitatorUrl: "https://gateway-api.circle.com",
-  networks: ["eip155:5042"],
+  networks: "eip155:5042",
 });
 
 // Health check — no payment required
@@ -70,7 +58,7 @@ app.get("/health", (_req, res) => {
 // Paid joke endpoint — 0.001 USDC per call
 app.get("/joke", gateway.require("$0.001"), (req: PaidRequest, res) => {
   const { payer, amount, network } = req.payment!;
-  const formattedAmount = formatUnits(BigInt(amount), 6);
+  const formattedAmount = (Number(amount) / 1_000_000).toFixed(6);
   const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
 
   console.log(
@@ -90,7 +78,4 @@ const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`[joke-server] Listening on http://localhost:${PORT}`);
   console.log(`[joke-server] GET /joke  — $0.001 USDC via x402 Gateway Nanopayments`);
-  if (!sellerAddress) {
-    console.warn("[joke-server] WARNING: SELLER_ADDRESS is not configured — payments will fail settlement.");
-  }
 });
