@@ -52,12 +52,12 @@ const gateway = createGatewayMiddleware({
 });
 
 // Health check — no payment required
-app.get("/health", (_req, res) => {
+app.get(["/health", "/api/health"], (_req, res) => {
   res.json({ status: "ok", service: "joke-seller", price: "$0.001 USDC per joke" });
 });
 
 // Paid joke endpoint — 0.001 USDC per call
-app.get("/joke", gateway.require("$0.001"), (req: PaidRequest, res) => {
+app.get(["/joke", "/api/joke"], gateway.require("$0.001"), (req: PaidRequest, res) => {
   const { payer, amount, network } = req.payment!;
   const formattedAmount = (Number(amount) / 1_000_000).toFixed(6);
   const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
