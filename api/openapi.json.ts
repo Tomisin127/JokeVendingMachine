@@ -19,10 +19,28 @@ const document = {
         operationId: "getRandomJoke",
         summary: "Buy a random joke",
         description: "Returns a random joke after the x402 payment is verified and settled.",
-        "x-payment": {
-          protocol: "x402",
-          price: "0.001",
-          currency: "USDC",
+        "x-payment-info": {
+          price: { mode: "fixed", currency: "USDC", amount: "0.001000" },
+          protocols: [{ x402: {} }],
+          accepts: [
+            { scheme: "exact", network: "eip155:5042", asset: "0x3600000000000000000000000000000000000000", payTo: sellerAddress },
+            { scheme: "exact", network: "eip155:137", asset: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", payTo: sellerAddress },
+          ],
+        },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                description: "No input fields are required; send an empty JSON object to request one random joke.",
+                properties: {},
+                additionalProperties: false,
+              },
+            },
+          },
+        },
+        "x402": {
           accepts: [
             { scheme: "exact", network: "eip155:5042", asset: "0x3600000000000000000000000000000000000000", payTo: sellerAddress },
             { scheme: "exact", network: "eip155:137", asset: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", payTo: sellerAddress },
