@@ -52,9 +52,8 @@ app.use((_req: express.Request, res: express.Response, next: express.NextFunctio
 });
 
 const sellerAddress = process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS;
-// Arc mainnet uses chain ID 5042 (Arc testnet is 5042002). Keep this
-// endpoint mainnet-only so payments from other networks are rejected.
-const arcMainnet = "eip155:5042";
+// Accept payments on Arc mainnet and Polygon mainnet.
+const paymentNetworks = ["eip155:5042", "eip155:137"] as const;
 
 const gateway = sellerAddress
   ? createGatewayMiddleware({

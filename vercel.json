@@ -4,6 +4,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/openapi.json", "destination": "/api/openapi.json" },
     { "source": "/joke", "destination": "/api/joke" },
     { "source": "/health", "destination": "/api/health" },
     { "source": "/((?!api(?:/|$)).*)", "destination": "/index.html" }
