@@ -47,8 +47,8 @@ app.use((req, res, next) => {
 const gateway = createGatewayMiddleware({
   sellerAddress: process.env.SELLER_ADDRESS ?? process.env.VITE_SELLER_ADDRESS,
   facilitatorUrl: "https://gateway-api.circle.com",
-  // Arc mainnet only. Arc testnet is 5042002.
-  networks: "eip155:5042",
+  // Accept payments on Arc mainnet and Polygon mainnet.
+  networks: ["eip155:5042", "eip155:137"],
 });
 
 // Health check — no payment required
