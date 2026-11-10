@@ -59,7 +59,7 @@ const gateway = sellerAddress
   ? createGatewayMiddleware({
       sellerAddress,
       facilitatorUrl: "https://gateway-api.circle.com",
-      networks: arcMainnet,
+      networks: paymentNetworks,
     })
   : null;
 
